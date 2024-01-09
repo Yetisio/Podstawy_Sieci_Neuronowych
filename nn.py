@@ -3,23 +3,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-# Load MNIST dataset
+#Zaladowanie MNIST_DATASET
 images, labels = get_mnist()
 
-# Initialize weights and biases for the neural network
-w_i_h = np.random.uniform(-0.5, 0.5, (20, 784))  # weights from input layer to hidden layer
-w_h_o = np.random.uniform(-0.5, 0.5, (10, 20))   # weights from hidden layer to output layer
+# Wagi i biasy sieci neurownoej
+w_i_h = np.random.uniform(-0.5, 0.5, (20, 784))   # weights from input layer to hidden layer
+w_h_o = np.random.uniform(-0.5, 0.5, (10, 20))    # weights from hidden layer to output layer
 b_i_h = np.zeros((20, 1))                         # biases for the hidden layer
 b_h_o = np.zeros((10, 1))                         # biases for the output layer
 
-# Set learning rate and initialize variables for tracking accuracy
+# Parametry uczenia
 learn_rate = 0.01
 nr_correct = 0
-
-# Set the number of training epochs
 epochs = 3
 
-# Training loop
+# Petla przyuczenia
 for epoch in range(epochs):
     for img, l in zip(images, labels):
         img.shape += (1,)
@@ -47,11 +45,11 @@ for epoch in range(epochs):
         w_i_h += -learn_rate * delta_h @ np.transpose(img)
         b_i_h += -learn_rate * delta_h
 
-    # Show accuracy for this epoch
+    # Pokazanie poziomu przyswojenia wiedzy w treningach w %
     print(f"Przyswojenie wiedzy poprzez trening nr {epoch+1}: {round((nr_correct / images.shape[0]) * 100, 2)}%")
     nr_correct = 0
 
-# Function to process an uploaded image
+# Funkcja wczytujaca zdjecie z np. Paint 
 def process_uploaded_image(image_path):
     img = cv2.imread(image_path, 0)  # Read image in grayscale
     resized_img = cv2.resize(img, (28, 28))  # Resize to 28x28 (MNIST image size)
@@ -59,12 +57,12 @@ def process_uploaded_image(image_path):
     flattened_img = normalized_img.flatten()  # Flatten to match the input size
     return flattened_img
 
-# Load a sample image for testing
+# Przypisanie sciezki do obrazka 
 uploaded_image_path = 'nr.jpg'  # Replace with your image path
 uploaded_image = process_uploaded_image(uploaded_image_path)
 
 # Forward propagation for the uploaded image
-uploaded_image = uploaded_image.reshape(784, 1)  # Reshape for input compatibility
+uploaded_image = uploaded_image.reshape(784, 1)  # Zmiana ksztaltu do kompatybilnosci
 
 # Forward propagation input -> hidden
 h_pre = b_i_h + w_i_h @ uploaded_image
@@ -74,7 +72,7 @@ h = 1 / (1 + np.exp(-h_pre))
 o_pre = b_h_o + w_h_o @ h
 o = 1 / (1 + np.exp(-o_pre))
 
-# Display the results
+# Wyswietlanie rezultatow
 plt.imshow(uploaded_image.reshape(28, 28), cmap="Greys")
 plt.title(f"Moja predykcja numeru ze zdjecia to: {o.argmax()}")
 plt.show()
