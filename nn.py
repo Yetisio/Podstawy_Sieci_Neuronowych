@@ -58,7 +58,7 @@ def process_uploaded_image(image_path):
     return flattened_img
 
 # Przypisanie sciezki do obrazka 
-uploaded_image_path = 'nr.jpg'  # Replace with your image path
+uploaded_image_path = 'numer.jpg' # Replace with your image path
 uploaded_image = process_uploaded_image(uploaded_image_path)
 
 # Forward propagation for the uploaded image

@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 t = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 h = np.array([1.0, 1.32, 1.6, 1.54, 1.41, 1.01, 0.6, 0.42, 0.2, 0.51, 0.8])
 
+mse_values = []  # Lista do przechowywania błędów
+weights_history = []  # Lista do przechowywania historii wag
+
 # Normalizacja danych
 t_normalized = t / np.max(t)
 h_normalized = h / np.max(h)
@@ -60,6 +63,14 @@ for epoch in range(epochs):
     bias_output += np.sum(output_delta, axis=0, keepdims=True) * learning_rate
     bias_hidden += np.sum(hidden_delta, axis=0, keepdims=True) * learning_rate
 
+     # Po obliczeniu błędu na końcu każdej epoki
+    mse = np.mean((h_normalized.reshape(-1, 1) - predicted_output)**2)
+    mse_values.append(mse)
+
+    # Zapisywanie historii wag
+    current_weights = np.concatenate([weights_input_hidden.flatten(), weights_hidden_output.flatten()])
+    weights_history.append(current_weights)
+
 # Aproksymacja danych testowych
 predicted_normalized = sigmoid(np.dot(sigmoid(np.dot(t_samples_normalized.reshape(-1, 1), weights_input_hidden) + bias_hidden), weights_hidden_output) + bias_output)
 
@@ -73,21 +84,48 @@ print(f"Średniokwadratowy błąd aproksymacji: {mse}")
 # Denormalizacja przewidzianych wartości przewidywanych dla predykcji probek 6min
 predicted_output_samples = predicted_normalized * np.max(h)
 
-# Wykres dla aproksymacji danych rzeczywistych
+
+# Wykres dla zbioru uczącego i wyników klasyfikacji
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 2, 1)
 plt.scatter(t, h, label='Dane rzeczywiste')
-plt.plot(t_samples, predicted_output, label='Aproksymacja sieci neuronowej', color='red')
 plt.xlabel('Czas [h]')
 plt.ylabel('Poziom wody [m]')
-plt.legend()
+plt.title('Zbiór uczący')
 
-
-# Wykres dla predykcji próbek 6-minutowych
-plt.scatter(t, h, label='Dane rzeczywiste')
-plt.scatter(t_samples, predicted_output_samples, label='Predykcje dla próbek 6-minutowych', color='green', marker='x')
+plt.subplot(1, 2, 2)
+plt.scatter(t_samples, predicted_output[:len(t_samples)], label='Predykcje')
 plt.xlabel('Czas [h]')
 plt.ylabel('Poziom wody [m]')
+plt.title('Wyniki klasyfikacji')
+
+plt.tight_layout()
+plt.show()
+
+# Wizualizacja błędów w trakcie procesu uczenia się
+plt.figure(figsize=(10, 5))
+
+plt.plot(range(epochs), mse_values, label='Błąd średniokwadratowy')
+plt.xlabel('Epoka')
+plt.ylabel('Błąd')
+plt.title('Błędy w trakcie uczenia się')
 plt.legend()
 plt.show()
 
+# Wizualizacja wartości wag w kolejnych iteracjach uczenia
+plt.figure(figsize=(16, 10))
+num_weights = input_size * hidden_size + hidden_size * output_size
 
+rows = 5
+cols = 4
 
+for i in range(num_weights):
+    plt.subplot(rows, cols, i + 1)
+    plt.plot(range(epochs), [weights[i] for weights in weights_history], label=f'Waga {i+1}')
+    plt.xlabel('Epoka')
+    plt.ylabel('Wartość wagi')
+    plt.title(f'Waga {i+1}')
+
+plt.tight_layout()
+plt.show()
