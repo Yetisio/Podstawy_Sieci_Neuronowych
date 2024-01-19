@@ -29,12 +29,26 @@ bias_output = np.zeros((1, output_size))
 learning_rate = 0.09
 epochs = 100000
 
-# Funkcje aktywacji
+# Funkcje aktywacji sigmoid
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 def sigmoid_derivative(x):
     return x * (1 - x)
+
+# Funkcje aktywacji tanh
+def tanh(x):
+    return np.tanh(x)
+
+def tanh_derivative(x):
+    return 1.0 - np.tanh(x)**2
+
+# Funkcje aktywacji relu
+def relu(x):
+    return np.maximum(0, x)
+
+def relu_derivative(x):
+    return np.where(x > 0, 1, 0)
 
 # Trening sieci neuronowej
 for epoch in range(epochs):
@@ -74,20 +88,32 @@ print(f"Średniokwadratowy błąd aproksymacji: {mse}")
 predicted_output_samples = predicted_normalized * np.max(h)
 
 # Wykres dla aproksymacji danych rzeczywistych
+plt.figure(figsize=(10, 6))
+
+# Pierwszy wykres - Aproksymacja z punktami rzeczywistymi
 plt.scatter(t, h, label='Dane rzeczywiste')
-plt.plot(t_samples, predicted_output, label='Aproksymacja sieci neuronowej', color='red')
+plt.plot(t_samples, predicted_output[:len(t_samples)], label='Aproksymacja sieci neuronowej', color='red')
 plt.xlabel('Czas [h]')
 plt.ylabel('Poziom wody [m]')
 plt.legend()
 
-
-# Wykres dla predykcji próbek 6-minutowych
+# Drugi wykres - Predykcje dla próbek 6-minutowych
+plt.figure(figsize=(10, 6))
 plt.scatter(t, h, label='Dane rzeczywiste')
 plt.scatter(t_samples, predicted_output_samples, label='Predykcje dla próbek 6-minutowych', color='green', marker='x')
 plt.xlabel('Czas [h]')
 plt.ylabel('Poziom wody [m]')
 plt.legend()
-plt.show()
 
+# Trzeci wykres - Łączący obie linie
+plt.figure(figsize=(10, 6))
+plt.scatter(t, h, label='Dane rzeczywiste')
+plt.plot(t_samples, predicted_output[:len(t_samples)], label='Aproksymacja sieci neuronowej', color='red')
+plt.scatter(t_samples, predicted_output_samples, label='Predykcje dla próbek 6-minutowych', color='green', marker='x')
+plt.xlabel('Czas [h]')
+plt.ylabel('Poziom wody [m]')
+plt.legend()
+
+plt.show()
 
 
